@@ -1,5 +1,6 @@
 package com.generation.lojadegames.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +53,19 @@ public class ProdutoController {
 	public ResponseEntity<List<Produto>> getByNomeproduto(@PathVariable("nomeproduto") String nomeProduto)  {
 		 return ResponseEntity.ok(produtoRepository.findAllByNomedoprodutoContainingIgnoreCase(nomeProduto));
 	}
+	
+	
+	//Fazer Metodo do buscar por maior preço
+	
+	@GetMapping("/preco/{precomaior}")
+	public ResponseEntity<List<Produto>> getByPrecoMaior(@PathVariable("precomaior") BigDecimal precoMaior) {
+	    List<Produto> produtos = produtoRepository.findAllByPrecoGreaterThanEqual(precoMaior);
+	    return ResponseEntity.ok(produtos);
+	}
+
+	
+	
+	
 	//CADASTRAR PRODUTO 
 	
 	@PostMapping
