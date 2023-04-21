@@ -20,79 +20,85 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.lojadegames.model.Produto;
+import com.generation.lojadegames.repository.CategoriaRepository;
 import com.generation.lojadegames.repository.ProdutoRepository;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/produtos")
-@CrossOrigin(origins="*",allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ProdutoController {
 
 	@Autowired
 	private ProdutoRepository produtoRepository;
-	
-	
-	//LISTAR TODOS OS PRODUTOS
+
+	@Autowired
+	private CategoriaRepository categoriaRepository;
+
+	// LISTAR TODOS OS PRODUTOS
 	@GetMapping
-	public ResponseEntity <List<Produto>> getAll(){
+	public ResponseEntity<List<Produto>> getAll() {
 		return ResponseEntity.ok(produtoRepository.findAll());
-		
-	}
-	//BUSCAR POR ID
-	@GetMapping("/{id}")
-	public ResponseEntity <Produto> getById(@PathVariable Long id){
-		
-		return produtoRepository.findById(id)
-			.map(resposta -> ResponseEntity.ok(resposta) )
-			.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-	}
-	
-	//BUSCAR POR TITULO
-	@GetMapping("/nomeproduto/{nomeproduto}")
-	public ResponseEntity<List<Produto>> getByNomeproduto(@PathVariable("nomeproduto") String nomeProduto)  {
-		 return ResponseEntity.ok(produtoRepository.findAllByNomedoprodutoContainingIgnoreCase(nomeProduto));
-	}
-	
-	
-	//Fazer Metodo do buscar por maior preço
-	
-	@GetMapping("/preco/{precomaior}")
-	public ResponseEntity<List<Produto>> getByPrecoMaior(@PathVariable("precomaior") BigDecimal precoMaior) {
-	    List<Produto> produtos = produtoRepository.findAllByPrecoGreaterThanEqual(precoMaior);
-	    return ResponseEntity.ok(produtos);
+
 	}
 
-	
-	
-	
-	//CADASTRAR PRODUTO 
-	
-	@PostMapping
-	public ResponseEntity <Produto> post(@Valid @RequestBody Produto produto){
-		
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(produtoRepository.save(produto));
-	}
-	
-	@PutMapping
-	public ResponseEntity <Produto> put(@Valid   @RequestBody Produto produto){
-		
-		return produtoRepository.findById(produto.getId())
-				.map(resposta -> ResponseEntity.status(HttpStatus.OK)
-						.body(produtoRepository.save(produto)))
+	// BUSCAR POR ID
+	@GetMapping("/{id}")
+	public ResponseEntity<Produto> getById(@PathVariable Long id) {
+
+		return produtoRepository.findById(id).map(resposta -> ResponseEntity.ok(resposta))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-		
 	}
-	
+
+	// BUSCAR POR TITULO
+	@GetMapping("/nomeproduto/{nomeproduto}")
+	public ResponseEntity<List<Produto>> getByNomeproduto(@PathVariable("nomeproduto") String nomeProduto) {
+		return ResponseEntity.ok(produtoRepository.findAllByNomedoprodutoContainingIgnoreCase(nomeProduto));
+	}
+
+	/* BUSCAR POR MAIOR PREÇO */
+	@GetMapping("/preco/{precomaior}")
+	public ResponseEntity<List<Produto>> getByPrecoMaior(@PathVariable("precomaior") BigDecimal precoMaior) {
+		List<Produto> produtos = produtoRepository.findAllByPrecoGreaterThanOrderByPreco(precoMaior);
+		return ResponseEntity.ok(produtos);
+	}
+
+	/* BUSCAR POR MENOR PREÇO */
+	@GetMapping("/preco_menor/{preco}")
+	public ResponseEntity<List<Produto>> getPrecoMenorQue(@PathVariable BigDecimal preco) {
+		return ResponseEntity.ok(produtoRepository.findAllByPrecoLessThanOrderByPrecoDesc(preco));
+	}
+
+	// CADASTRAR PRODUTO
+
+	@PostMapping
+	public ResponseEntity<Produto> post(@Valid @RequestBody Produto produto) {
+		return categoriaRepository.findById(produto.getCategoria().getId())
+				.map(resposta -> ResponseEntity.status(HttpStatus.CREATED).body(produtoRepository.save(produto)))
+				.orElse(ResponseEntity.badRequest().build());
+	}
+
+	@PutMapping
+	public ResponseEntity<Produto> putProduto(@Valid @RequestBody Produto produto) {
+
+		if (produtoRepository.existsById(produto.getId())) {
+
+			return categoriaRepository.findById(produto.getCategoria().getId())
+					.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produto)))
+					.orElse(ResponseEntity.badRequest().build());
+		}
+		return ResponseEntity.notFound().build();
+	}
+
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) {
-		Optional<Produto> produto= produtoRepository.findById(id);
-		
-		if(produto.isEmpty())
+		Optional<Produto> produto = produtoRepository.findById(id);
+
+		if (produto.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		produtoRepository.deleteById(id);
 	}
-	
+
 }
