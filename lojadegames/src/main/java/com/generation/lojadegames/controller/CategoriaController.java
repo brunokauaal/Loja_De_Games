@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.lojadegames.model.Categoria;
-import com.generation.lojadegames.model.Produto;
+
 import com.generation.lojadegames.repository.CategoriaRepository;
 
 import jakarta.validation.Valid;
