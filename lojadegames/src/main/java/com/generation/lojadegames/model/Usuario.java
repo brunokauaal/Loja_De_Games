@@ -1,5 +1,10 @@
 package com.generation.lojadegames.model;
 
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,6 +42,12 @@ public class Usuario {
 	@Size (max= 5000, message= "A Foto não poder ter mais que  5000 caracteres!")
 	private String foto;
 
+	/* DESAFIO*/
+	@JsonFormat(pattern = "yyyy/MM/dd")
+	@NotNull(message= "O Atributo data de nascimento é Obrigatorio!")
+	private LocalDate dataNascimento;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -76,6 +87,20 @@ public class Usuario {
 	public void setSenha(String senha) {
 		this.senha = senha;
 	}
+
+	//* Data nascimento */
+	
+	public LocalDate getDatadenascimento() {
+		return dataNascimento;
+	}
+
+	public void setDatadenascimento(LocalDate datadenascimento) {
+		this.dataNascimento = datadenascimento;
+	}
+
+	
+
+	
 	
 	
 	

@@ -1,5 +1,7 @@
 package com.generation.lojadegames.service;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +30,35 @@ public class UsuarioService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    
+    
+ 
+        
+    
+ 
+    
 	public Optional<Usuario> cadastrarUsuario(Usuario usuario) {
 
 		if (usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent())
 			return Optional.empty();
 
+		if (checarIdade(usuario.getDatadenascimento()) < 18)
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Usuario é menor de idade",null);
+		
+		
 		usuario.setSenha(criptografarSenha(usuario.getSenha()));
 
 		return Optional.of(usuarioRepository.save(usuario));
 	
 	}
+	
+	
+	
+	 private int checarIdade(LocalDate dataNascimento) {
+	        return  Period.between(dataNascimento,LocalDate.now()).getYears();
+	 }
+	
+	
 
 	public Optional<Usuario> atualizarUsuario(Usuario usuario) {
 		
@@ -48,9 +69,18 @@ public class UsuarioService {
 			if ( (buscaUsuario.isPresent()) && ( buscaUsuario.get().getId() != usuario.getId()))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
 
+			
+			if (checarIdade(usuario.getDatadenascimento()) < 18)
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Usuario é menor de idade",null);
+			
+			
 			usuario.setSenha(criptografarSenha(usuario.getSenha()));
 
 			return Optional.ofNullable(usuarioRepository.save(usuario));
+			
+			
+			
+			
 			
 		}
 
@@ -79,8 +109,10 @@ public class UsuarioService {
 			   usuarioLogin.get().setId(usuario.get().getId());
                 usuarioLogin.get().setNome(usuario.get().getNome());
                 usuarioLogin.get().setFoto(usuario.get().getFoto());
+                usuarioLogin.get().setDataNascimento(usuario.get().getDatadenascimento());
                 usuarioLogin.get().setToken(gerarToken(usuarioLogin.get().getUsuario()));
                 usuarioLogin.get().setSenha("");
+               
 				
                  // Retorna o Objeto preenchido
 			   return usuarioLogin;
