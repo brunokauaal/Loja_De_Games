@@ -1,9 +1,9 @@
 package com.generation.lojadegames.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-import org.hibernate.annotations.UpdateTimestamp;
+
+
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -45,8 +45,6 @@ public class Produto {
 	
 	private Long curtir;
 	
-	@UpdateTimestamp
-	private LocalDateTime data;
 
 	@ManyToOne
 	@JsonIgnoreProperties("produto")
@@ -101,13 +99,7 @@ public class Produto {
 		this.foto = foto;
 	}
 
-	public LocalDateTime getData() {
-		return data;
-	}
-
-	public void setData(LocalDateTime data) {
-		this.data = data;
-	}
+	
 
 	public Long getCurtir() {
 		return curtir;

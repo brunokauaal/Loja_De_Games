@@ -37,7 +37,7 @@ public class ProdutoController {
 	private CategoriaRepository categoriaRepository;
 
 	// LISTAR TODOS OS PRODUTOS
-	@GetMapping
+	@GetMapping("/verprodutos")
 	public ResponseEntity<List<Produto>> getAll() {
 		return ResponseEntity.ok(produtoRepository.findAll());
 
@@ -72,11 +72,10 @@ public class ProdutoController {
 
 	// CADASTRAR PRODUTO
 
-	@PostMapping
+	@PostMapping ("/cadastrarproduto")
 	public ResponseEntity<Produto> post(@Valid @RequestBody Produto produto) {
-		return categoriaRepository.findById(produto.getCategoria().getId())
-				.map(resposta -> ResponseEntity.status(HttpStatus.CREATED).body(produtoRepository.save(produto)))
-				.orElse(ResponseEntity.badRequest().build());
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(produtoRepository.save(produto));
 	}
 
 	@PutMapping
